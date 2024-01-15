@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h1>Kebab Case</h1>
+  <ul id="kebabCase" style="list-style-type: none;"></ul>
+  <hr>
+  <h1>i18n</h1>
+  <ul id="idezoiton" style="list-style-type: none;"></ul>
+  <hr>
+  <h1>Props</h1>
+  <ul id="props" style="list-style-type: none;"></ul>
+  <hr>
+  <h1>Attributes</h1>
+  <ul id="attributes" style="list-style-type: none;"></ul>
+  <hr>
+
+  <script>
+  let array = [];
+  let element;
+  
+  while (element !== 'stop') {
+    let element = prompt('Diga o nome do elemento (ou "stop" para parar)');
+    if(element !== 'stop'){
+      if(element.includes(',')) {
+        element = element.split(',');
+        element.forEach(el => array.push(camelize(el)))
+      } else array.push(camelize(element))
+    }
+    else break;
+
+    callAllBuddies();
+  }
+
+  function callAllBuddies() {
+    converterCamelKebab (array);
+    converteri18n (array);
+    convertToProps(array);
+    convertToAttr(array);
+  }
+
+  function camelize(str) {
+    str = str.replace(/\s/g, '');
+    return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match, index) {
+      if (+match === 0) return ""; // or if (/\s+/.test(match)) for white spaces
+      return index === 0 ? match.toLowerCase() : match.toUpperCase();
+    });
+  }
+
+  function breakLine(array) {
+    let arrayLi = [];
+    array.forEach(el => {
+      arrayLi.push(`<li>${el},</li>`);
+    })
+    return arrayLi;
+  }
+
+  function converterCamelKebab (arrayCamelCase) {
+    let arrayKebab = [];
+    arrayCamelCase.forEach(el => {
+        let elCamelized = el;
+        el = el.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
+        arrayKebab.push(`${el}="$\{properties.${elCamelized} || 'dia.registration-form-${el}' @ i18n, context='text'}"`);
+    });
+    return (
+      document.getElementById('kebabCase').innerHTML = breakLine(arrayKebab)
+    );
+  };
+
+  function converteri18n (arrayCamelCase) {
+    let arrayi18n = [];
+    arrayCamelCase.forEach(el => {
+        el = el.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
+        arrayi18n.push(`"dia.registration-form-${el}": " "`);
+    })
+    return (
+      document.getElementById('idezoiton').innerHTML = breakLine(arrayi18n)
+    );
+  };
+
+  function convertToProps(arrayCamelCase) {
+    let arrayProps = [];
+    array.forEach(el => {
+        arrayProps.push(`${el}: String`);
+    });
+    return (
+      document.getElementById('props').innerHTML = breakLine(arrayProps)
+    );
+  };
+
+  function convertToAttr(arrayCamelCase) {
+    let arrayAttr = [];
+    array.forEach(el => {
+      arrayAttr.push(`:${el}="${el}"`);
+    });
+
+    return (
+      document.getElementById('attributes').innerHTML = breakLine(arrayAttr)
+    );
+  };
+
+  </script>
+</body>
+</html>
